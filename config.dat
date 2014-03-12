@@ -1,0 +1,39 @@
+# Configuration File for Python Google Drive Backup Script
+
+[General]
+
+# Change the working directory of the backup script; this is where the script will dump the DB and files and send them zipped off to Google Drive
+working_path = ~/backup_files/
+
+# How long backup files should be kept in the working directory (in minutes)
+temp_file_persist_time = 7200
+
+# The prefix for the .zip file generated that will be uploaded to Google Drive (ex. prefix_mm_dd_yyyy-hh-mm-ss)
+backup_prefix = 
+
+[Mysql]
+
+# True or False based on whether you want a database or many backed up
+db_backup = True
+
+# Comma separated list of MySQL databases to back up
+db_name = 
+
+# MySQL user with required permissions on the database specified above (don't use root; create a special user with only basic permissions)
+# Permissions needed: SELECT, LOCK TABLES, SHOW VIEW, EVENT, TRIGGER, EXECUTE (only if needed)
+# If multiple databases are indicated to back up, enter a comma separated list of users in the same order as the databases are listed
+db_user = 
+
+# Password for user chosen above; comma separated list of passwords corresponding to order of users above
+db_user_password = 
+
+# The prefix for the SQL file generated (ex. prefix_mm_dd_yyyy); enter a comma separated list with order corresponding to databases to back up
+db_prefix = 
+
+[Email]
+
+# Comma separated list of email addresses that error messages and success messages will be sent to
+to_email = example@gmail.com
+
+# Email address that the messages will be addressed from
+from_email = example@mydomain.com
