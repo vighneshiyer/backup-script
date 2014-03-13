@@ -27,7 +27,7 @@ class UserParams:
 
 	# Main fetching method
 	def fetch_params(self):
-		config = ConfigParser.ConfigParser()
+		config = ConfigParser.ConfigParser(allow_no_value=True)
 		config.read(self.config_file)
 		self.parser_error_catcher(self.fetcher, config)
 		self.check_generals()
@@ -64,7 +64,10 @@ class UserParams:
 		self.isValidEmail(params.params['from_email'])
 
 	def check_dir_params(self):
-		
+		self.params['dir_backup'] = True if self.params['db_backup'].upper() == 'TRUE' else False
+		self.params['dir_list'] = self.str_to_list(self.params['db_name'])
+		for dir in self.params['dir_list']:
+			self.isValidDir(dir)
 
 ###### Validation Functions ######
 	def str_to_list(self, input):

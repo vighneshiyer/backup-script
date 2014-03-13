@@ -17,6 +17,7 @@ import logging
 import calendar
 from email.mime.text import MIMEText
 #import smtplib
+import zipfile
 
 from userparams import UserParams
 import os_functions
@@ -51,3 +52,10 @@ if params.params['db_backup'] is True:
 		dest_path = backup_folder_path
 		filename = params.params['db_prefix'][index] + '_' + params.params['current_date_string'] + '.sql'
 		attempt_dump(name, user, user_pwd, dest_path, filename)
+
+if params.params['dir_backup'] is True:
+	for index in xrange(0, params.params['db_name'].length()):
+		destination_dir = backup_folder_path
+		dir_to_be_zipped = params.params['dir_list'][index]
+		prefix = params.params['dir_prefix'][index]
+		zip_a_file(dir_to_be_zipped, destination_dir, prefix)

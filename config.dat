@@ -38,6 +38,10 @@ dir_backup = True
 # Comma separated list of directories to zip and backup, *** add the trailing slash *** (ex. /var/www/wordpress/)
 dir_list = 
 
+# Comma separated list of prefixes to prefix to the zipped directories; corresponding to order of dirs above
+# Example: if dir_prefix is wp, and dir name is website, then zipped dir will be wp_website
+dir_prefix = 
+
 [Files]
 
 [Email]
