@@ -30,6 +30,16 @@ db_user_password =
 # The prefix for the SQL file generated (ex. prefix_mm_dd_yyyy); enter a comma separated list with order corresponding to databases to back up
 db_prefix = 
 
+[Directories]
+
+# True or False based on whether you want a directory or many backed up
+dir_backup = True
+
+# Comma separated list of directories to zip and backup, *** add the trailing slash *** (ex. /var/www/wordpress/)
+dir_list = 
+
+[Files]
+
 [Email]
 
 # Comma separated list of email addresses that error messages and success messages will be sent to

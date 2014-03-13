@@ -43,10 +43,11 @@ if not os.path.exists(backup_folder_path):
 	os.makedirs(backup_folder_path)
 
 # Run mysqldump and dump all the SQL files into the main backup folder
-for index in xrange(0, params.params['db_name'].length()):
-	name = params.params['db_name'][index]
-	user = params.params['db_user'][index]
-	user_pwd = params.params['db_user_password'][index]
-	dest_path = backup_folder_path
-	filename = params.params['db_prefix'][index] + '_' + params.params['current_date_string'] + '.sql'
-	attempt_dump(name, user, user_pwd, dest_path, filename)
+if params.params['db_backup'] is True:
+	for index in xrange(0, params.params['db_name'].length()):
+		name = params.params['db_name'][index]
+		user = params.params['db_user'][index]
+		user_pwd = params.params['db_user_password'][index]
+		dest_path = backup_folder_path
+		filename = params.params['db_prefix'][index] + '_' + params.params['current_date_string'] + '.sql'
+		attempt_dump(name, user, user_pwd, dest_path, filename)

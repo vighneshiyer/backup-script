@@ -18,7 +18,8 @@ class UserParams:
 		self.general_params = { 'General': ['working_path', 'temp_file_persist_time', 'backup_prefix'] }
 		self.mysql_params = { 'Mysql': ['db_backup', 'db_name', 'db_user', 'db_user_password', 'db_prefix']}
 		self.email_params = { 'Email': ['to_email', 'from_email']}
-		self.params_list = [self.general_params, self.mysql_params, self.email_params]
+		self.dir_params = { 'Directories': ['dir_backup', 'dir_list']}
+		self.params_list = [self.general_params, self.mysql_params, self.email_params, self.dir_params]
 
 		self.params['current_date_string'] = time.strftime('%m-%d-%Y')
 		self.params['current_time_string'] = time.strftime('%H:%M:%S')
@@ -29,9 +30,10 @@ class UserParams:
 		config = ConfigParser.ConfigParser()
 		config.read(self.config_file)
 		self.parser_error_catcher(self.fetcher, config)
-		#self.check_generals()
+		self.check_generals()
 		self.check_mysql_params()
 		self.check_email_params()
+		self.check_dir_params()
 
 	def fetcher(self, parser):
 		for section in self.params_list:
@@ -60,6 +62,9 @@ class UserParams:
 	def check_email_params(self):
 		self.isValidEmail(params.params['to_email'])
 		self.isValidEmail(params.params['from_email'])
+
+	def check_dir_params(self):
+		
 
 ###### Validation Functions ######
 	def str_to_list(self, input):
