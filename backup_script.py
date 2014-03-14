@@ -6,27 +6,13 @@ pip install httplib2
 pip install google-api-python-client
 MAKE SURE that your PYTHONPATH contains the library path ( in Ubuntu make sure ~/.profile contains export PYTHONPATH=$PYTHONPATH:/usr/local/lib/python2.7/dist-packages/ )
 """
-import time
-import subprocess
-import sys
 import os
 import xrange
-#import httplib2
-#import pprint
 import logging
-import calendar
-from email.mime.text import MIMEText
-#import smtplib
-import zipfile
 
 from userparams import UserParams
 import os_functions
 import mysql_functions
-
-#from apiclient.discovery import build
-#from apiclient.http import MediaFileUpload
-#from oauth2client.client import OAuth2WebServerFlow
-#from oauth2client.file import Storage
 
 logging.basicConfig()
 
@@ -53,9 +39,23 @@ if params.params['db_backup'] is True:
 		filename = params.params['db_prefix'][index] + '_' + params.params['current_date_string'] + '.sql'
 		attempt_dump(name, user, user_pwd, dest_path, filename)
 
+# Zip up all the directories into the main backup folder
 if params.params['dir_backup'] is True:
 	for index in xrange(0, params.params['db_name'].length()):
 		destination_dir = backup_folder_path
 		dir_to_be_zipped = params.params['dir_list'][index]
 		prefix = params.params['dir_prefix'][index]
 		zip_a_file(dir_to_be_zipped, destination_dir, prefix)
+
+# Zip up the main backup folder
+zip_a_file(backup_folder_path, params.params['working_path'], '')
+
+# Upload zipped backup folder to Google Drive
+main_backup_folder_zipped_path = params.params['working_path'] + backup_folder_name + '.zip'
+upload_to_google_drive(main_backup_folder_zipped_path, backup_folder_name)
+
+# Send notification email
+sendmail(message='Backup completed on ' + params.params['current_date_string'] + ' ' + params.params['current_time_string'],
+subject='Successful Backup',
+from_address=params.params['from_email'],
+to_address=params.params['to_email'])

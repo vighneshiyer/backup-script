@@ -19,7 +19,8 @@ class UserParams:
 		self.mysql_params = { 'Mysql': ['db_backup', 'db_name', 'db_user', 'db_user_password', 'db_prefix']}
 		self.email_params = { 'Email': ['to_email', 'from_email']}
 		self.dir_params = { 'Directories': ['dir_backup', 'dir_list']}
-		self.params_list = [self.general_params, self.mysql_params, self.email_params, self.dir_params]
+		self.drive_params = { 'Google Drive': ['client_id', 'client_secret', 'oauth_scope', 'redirect_url']}
+		self.params_list = [self.general_params, self.mysql_params, self.email_params, self.dir_params, self.drive_params]
 
 		self.params['current_date_string'] = time.strftime('%m-%d-%Y')
 		self.params['current_time_string'] = time.strftime('%H:%M:%S')
@@ -34,6 +35,7 @@ class UserParams:
 		self.check_mysql_params()
 		self.check_email_params()
 		self.check_dir_params()
+		self.check_drive_params()
 
 	def fetcher(self, parser):
 		for section in self.params_list:
@@ -69,7 +71,17 @@ class UserParams:
 		for dir in self.params['dir_list']:
 			self.isValidDir(dir)
 
+	def check_drive_params(self):
+		self.isNotEmpty(params.params['client_id'])
+		self.isNotEmpty(params.params['client_secret'])
+		self.isNotEmpty(params.params['oauth_scope'])
+		self.isNotEmpty(params.params['redirect_url'])
+
 ###### Validation Functions ######
+	def isNotEmpty(self, input):
+		if input is None or not input:
+			terminate('Required value is empty')
+
 	def str_to_list(self, input):
 		temp_lst = input.split(',')
 		return [db.strip() for db in temp_lst]

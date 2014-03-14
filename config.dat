@@ -51,3 +51,15 @@ to_email = example@gmail.com
 
 # Email address that the messages will be addressed from
 from_email = example@mydomain.com
+
+[Google Drive]
+
+# From Google Developers Console
+client_id = 349125435435-t1avo12vc4iq1eii4ba2ma9ji2hloeu8.apps.googleusercontent.com
+
+client_secret = ZJa5JfR3afGHGTEgOlJzOtsX
+
+ # Don't change this if you want to store files to Google Drive
+oauth_scope = https://www.googleapis.com/auth/drive
+
+redirect_url = urn:ietf:wg:oauth:2.0:oob
