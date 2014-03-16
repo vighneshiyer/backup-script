@@ -47,7 +47,7 @@ class UserParams:
 		try:
 			function_call(function_param)
 		except ConfigParser.NoSectionError as e:
-			os_functions.terminate(e.__str__(), self.params)
+			os_functions.terminate(e.__str__(), 'Parsing Error', self.params)
 
 ###### Section Check Functions ######
 	def check_generals(self):

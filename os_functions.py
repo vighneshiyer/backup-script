@@ -20,17 +20,19 @@ import subprocess
 import sys
 
 def terminate(message, subject, params):
-	msg = MIMEText(message + '\n' + params['current_date_string'] + ' ' + params['current_time_string'])
-	if not subject:
-		msg['Subject'] = 'Backup Error' + ' ' + params['current_date_string'] + ' ' + params['current_time_string']
-	else:
-		msg['Subject'] = 'Backup Error - ' + subject + ' ' + params['current_date_string'] + ' ' + params['current_time_string']
-	msg['From'] = params['from_email']
-	msg['To'] = params['to_email']
-	s = smtplib.SMTP('localhost')
-	s.sendmail(params['from_email'], params['to_email'], msg.as_string())
-	s.quit()
-	sys.exit(message + "\nScript Exiting")
+	print(params)
+	if 'from_email' in params.keys() and 'to_email' in params.keys():
+		msg = MIMEText(message + '\n' + params['current_date_string'] + ' ' + params['current_time_string'])
+		if not subject:
+			msg['Subject'] = 'Backup Error' + ' ' + params['current_date_string'] + ' ' + params['current_time_string']
+		else:
+			msg['Subject'] = 'Backup Error - ' + subject + ' ' + params['current_date_string'] + ' ' + params['current_time_string']
+		msg['From'] = params['from_email']
+		msg['To'] = params['to_email']
+		s = smtplib.SMTP('localhost')
+		s.sendmail(params['from_email'], params['to_email'], msg.as_string())
+		s.quit()
+	sys.exit(subject + '\n' + message + "\nScript Exiting")
 
 def sendmail(subject, message, from_address, to_address):
 	msg = MIMEText(message)
@@ -64,7 +66,6 @@ def zip_a_file(dir_to_be_zipped, destination_dir, destination_filename_prefix):
 	try:
 		zip_status = subprocess.check_output('zip -r ' + zip_filename + ' '+ dir_name + ' > /dev/null && mv ' + zip_filename + ' ' + destination_dir, shell=True, stderr=subprocess.STDOUT)
 	except subprocess.CalledProcessError as e:
-		print(e.returncode)
 		if e.returncode == 1:
 			pass
 		else:
