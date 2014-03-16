@@ -1,6 +1,3 @@
-import httplib2
-import smtplib
-from userparams import UserParams
 from email.mime.text import MIMEText
 
 from apiclient.discovery import build
@@ -8,30 +5,34 @@ from apiclient.http import MediaFileUpload
 from oauth2client.client import OAuth2WebServerFlow
 from oauth2client.file import Storage
 
+#from apiclient import discovery
+#from apiclient.http import MediaFileUpload
+#from oauth2client.file import Storage
+#from oauth2client import client
+#from oauth2client import tools
+
+import os
 import zipfile
 import zlib
+import httplib2
+import smtplib
+import subprocess
+import sys
 
-params = UserParams('config.dat')
-params.fetch_params()
-current_date = params.params['current_date_string']
-current_time = params.params['current_time_string']
-from_email = params.params['from_email']
-to_email = params.params['to_email']
-
-def terminate(self, message, subject=''):
-	msg = MIMEText(message + '\n' + current_date + ' ' + current_time)
+def terminate(message, subject, params):
+	msg = MIMEText(message + '\n' + params['current_date_string'] + ' ' + params['current_time_string'])
 	if not subject:
-		msg['Subject'] = 'Backup Error' + ' ' + current_date + ' ' + current_time
+		msg['Subject'] = 'Backup Error' + ' ' + params['current_date_string'] + ' ' + params['current_time_string']
 	else:
-		msg['Subject'] = 'Backup Error - ' + subject + ' ' + current_date + ' ' + current_time
-	msg['From'] = from_email
-	msg['To'] = to_email
+		msg['Subject'] = 'Backup Error - ' + subject + ' ' + params['current_date_string'] + ' ' + params['current_time_string']
+	msg['From'] = params['from_email']
+	msg['To'] = params['to_email']
 	s = smtplib.SMTP('localhost')
-	s.sendmail(from_email, to_email, msg.as_string())
+	s.sendmail(params['from_email'], params['to_email'], msg.as_string())
 	s.quit()
 	sys.exit(message + "\nScript Exiting")
 
-def sendmail(self, subject, message, from_address, to_address):
+def sendmail(subject, message, from_address, to_address):
 	msg = MIMEText(message)
 	msg['Subject'] = subject
 	msg['From'] = from_address
@@ -42,16 +43,59 @@ def sendmail(self, subject, message, from_address, to_address):
 	s.quit()
 
 def zip_a_file(dir_to_be_zipped, destination_dir, destination_filename_prefix):
-	os.chdir(destination_dir)
-	zipf = zipfile.ZipFile(destination_filename_prefix + os.path.dirname(dir_to_be_zipped) + '.zip', 'w', zipfile.ZIP_DEFLATED)
-	for root, dirs, files in os.walk(dir_to_be_zipped):
-		for file in files:
-			zipf.write(os.path.join(root, file))
-	zipf.close();
+#
+#	os.chdir(destination_dir)
+#	if not destination_filename_prefix:
+#		zipf = zipfile.ZipFile(os.path.basename(os.path.normpath(dir_to_be_zipped)) + '.zip', 'w', zipfile.ZIP_DEFLATED)
+#	else:
+#		zipf = zipfile.ZipFile(destination_filename_prefix + '_' + os.path.basename(os.path.normpath(dir_to_be_zipped)) + '.zip', 'w', zipfile.ZIP_DEFLATED)
+#	os.chdir(os.path.dirname(dir_to_be_zipped))
+#	for root, dirs, files in os.walk(dir_to_be_zipped):
+#		for file in files:
+#			zipf.write(os.path.join(root, file))
+#	zipf.close();
+	print('Zipping ' + os.path.dirname(dir_to_be_zipped))
+	os.chdir(os.path.dirname(os.path.dirname(dir_to_be_zipped)))
+	dir_name = os.path.basename(os.path.normpath(dir_to_be_zipped))
+	if not destination_filename_prefix:
+		zip_filename = dir_name + '.zip'
+	else:
+		zip_filename = destination_filename_prefix + '_' + dir_name + '.zip'
+	try:
+		zip_status = subprocess.check_output('zip -r ' + zip_filename + ' '+ dir_name + ' > /dev/null && mv ' + zip_filename + ' ' + destination_dir, shell=True, stderr=subprocess.STDOUT)
+	except subprocess.CalledProcessError as e:
+		print(e.returncode)
+		if e.returncode == 1:
+			pass
+		else:
+			raise
 
-def upload_to_google_drive(file_to_be_uploaded, filename):
+def upload_to_google_drive(file_to_be_uploaded, filename, params, flags):
+	"""
+	CLIENT_SECRETS = os.path.join(os.path.dirname(__file__), 'client_secrets.json')
+	FLOW = client.flow_from_clientsecrets(CLIENT_SECRETS,
+	  scope=[
+	      'https://www.googleapis.com/auth/drive',
+	      'https://www.googleapis.com/auth/drive.appdata',
+	      'https://www.googleapis.com/auth/drive.apps.readonly',
+	      'https://www.googleapis.com/auth/drive.file',
+	      'https://www.googleapis.com/auth/drive.metadata.readonly',
+	      'https://www.googleapis.com/auth/drive.readonly',
+	      'https://www.googleapis.com/auth/drive.scripts',
+	    ],
+	    message=tools.message_if_missing(CLIENT_SECRETS))
 
-	storage = Storage('credentials')
+	storage = Storage('credentials.dat')
+	credentials = storage.get()
+	if credentials is None or credentials.invalid:
+		credentials = tools.run_flow(FLOW, storage, flags)
+
+	http = httplib2.Http()
+	http = credentials.authorize(http)
+	service = discovery.build('drive', 'v2', http=http)
+
+	"""
+	storage = Storage('credentials.dat')
 
 	if not storage.get():
 		# Authenticate with Google Drive
@@ -67,13 +111,13 @@ def upload_to_google_drive(file_to_be_uploaded, filename):
 	http = httplib2.Http()
 	http = credentials.authorize(http)
 	drive_service = build('drive', 'v2', http=http)
-
+	
 	print 'Auth success!' # Debug purposes
 
 	media_body = MediaFileUpload(file_to_be_uploaded, mimetype='application/zip', resumable=True)
 	body = {
 		'title': filename,
-		'description': 'Backup ' + current_date + ' ' + current_time,
+		'description': 'Backup ' + params.params['current_date_string'] + ' ' + params.params['current_time_string'],
 		'mimeType': 'application/zip'
 	}
 
