@@ -1,9 +1,3 @@
-1. FTP files to server
-2. Install dependencies
-3. Edit config.dat
-4. Set up as cron job
-5. Check logs occasionally
-
 # Description
 
 A Python script I wrote to perform automated regular backups on VPSs. The script can be run as a cron job once it is set up. It is designed to be a set and forget solution for backups to the cloud (Google Drive).
