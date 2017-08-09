@@ -1,23 +1,22 @@
 # Description
 
-A Python script I wrote to perform automated regular backups on VPSs. The script can be run as a cron job once it is set up. It is designed to be a set and forget solution for backups to the cloud (Google Drive).
+A bash script to dump certain MySQL databases, zip up certain directories, and upload a zipped package to Google Drive.
 
-# Installation
+# Usage 
 
-1. FTP files to server. You can upload everything including the modules, or you can install them via pip/easy_install
+1. Install gdrive (https://github.com/prasmussen/gdrive). Run `gdrive about` to authenticate.
 
-2. Install dependencies. You can install httplib2 and google-api-python-client, or just place the modules in the same folder as the script.
+2. Create a dedicated MySQL user (`backup_user`) with only read and lock permissions for all databases.
 
-3. Edit config.dat. The options are self-explanatory.
+3. Create a file `~/.my.cnf` with contents:
 
-4. Get credentials. 
-Go to the [Google quickstart page](https://developers.google.com/api-client-library/python/start/installation) using the Google account you want to backup the files into. Select the Drive API and command line, and click Configure Project.
-Download the client secrets file, and upload it to the same directory as the backup script
-Download the sample application, and put the client secrets file in its directory
-Run the sample application to generate sample.dat (a credentials file)
-- Rename sample.dat to credentials.dat and upload it to the server, in the working_path directory.
+	[mysqldump]
+	user=<special backup user>
+	password=<special backup user's password>
 
-5. Set up as cron job.
+4. Create a file `backup-script/config` with contents:
 
-6. Test the script with:
-python2.7 backup_script.py
+	declare -a BACKUP_DBs=("db1" "db2")
+	declare -a BACKUP_FOLDERS=("/var/www/web1" "/var/www/web2")
+
+5. Add `backup-script/backup_script` to non-root crontab.

@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+BACKUP_DIR="/tmp/$(date +"%B-%d-%Y_%T")"
+source config
+
+echo ${BACKUP_DIR}
+rm -rf ${BACKUP_DIR}
+mkdir ${BACKUP_DIR}
+
+for i in "${BACKUP_DBs[@]}"
+do
+	echo Backing up MySQL DB: ${i}
+	mysqldump -u backup_user ${i} > ${BACKUP_DIR}/${i}_mysql.sql
+done
+
+for i in "${BACKUP_FOLDERS[@]}"
+do
+	echo Backing up folder: ${i}
+	cd ${i}/..; zip -rq ${BACKUP_DIR}/$(basename ${i}).zip $(basename ${i}) 
+done
+
+echo Zipping up collected archive for upload
+cd ${BACKUP_DIR}/..; zip -rq ${BACKUP_DIR}/../$(basename ${BACKUP_DIR}).zip $(basename ${BACKUP_DIR})
+gdrive upload --delete ${BACKUP_DIR}/../$(basename ${BACKUP_DIR}).zip
