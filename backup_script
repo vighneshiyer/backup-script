@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 BACKUP_DIR="/tmp/$(date +"%B-%d-%Y_%T")"
+BACKUP_ZIP="/tmp/$(basename ${BACKUP_DIR}).zip"
 source config
 
-echo ${BACKUP_DIR}
+echo Backup being constructed in this folder: ${BACKUP_DIR}
 rm -rf ${BACKUP_DIR}
 mkdir ${BACKUP_DIR}
 
@@ -18,6 +19,7 @@ do
 	cd ${i}/..; zip -rq ${BACKUP_DIR}/$(basename ${i}).zip $(basename ${i}) 
 done
 
-echo Zipping up collected archive for upload
-cd ${BACKUP_DIR}/..; zip -rq ${BACKUP_DIR}/../$(basename ${BACKUP_DIR}).zip $(basename ${BACKUP_DIR})
-gdrive upload --delete ${BACKUP_DIR}/../$(basename ${BACKUP_DIR}).zip
+echo Zipping up collected archive in ${BACKUP_ZIP}
+cd ${BACKUP_DIR}/..; zip -rq ${BACKUP_ZIP} $(basename ${BACKUP_DIR})
+gdrive upload --delete ${BACKUP_ZIP}
+rm -rf ${BACKUP_DIR}
