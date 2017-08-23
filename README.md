@@ -23,4 +23,8 @@ A bash script to dump certain MySQL databases, zip up certain directories, and u
 	declare -a BACKUP_FOLDERS=("/var/www/web1" "/var/www/web2")
 ```
 
-5. Add `backup-script/backup_script` to non-root crontab.
+5. Add `backup-script/backup_script` to non-root crontab, as such (for daily backup at 2:10am, and backup-script repo in home folder):
+
+```
+	10 2 * * * cd ~/backup-script && ./backup_script
+```
